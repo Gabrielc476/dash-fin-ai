@@ -1,6 +1,6 @@
 // src/config/database.ts
 import { Sequelize } from "sequelize";
-import { config } from "./enviroment";
+import { config } from "./environment";
 
 const sequelize = new Sequelize(
   config.database.name,

@@ -4,7 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { errorMiddleware } from "../middleware/error.middleware";
-import { config } from "./enviroment";
+import { config } from "./environment";
 
 // Remova a importação do swagger que está causando o erro
 // import swaggerUi from 'swagger-ui-express';
