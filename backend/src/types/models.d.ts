@@ -68,8 +68,9 @@ export interface Transaction {
   createdAt: Date;
   updatedAt: Date;
 
-  // Propriedades de relacionamento (opcional)
+  // Propriedades de relacionamento (incluindo associações)
   category?: Category;
+  getCategory?: () => Promise<Category>;
 }
 
 export interface TransactionCreateDto {

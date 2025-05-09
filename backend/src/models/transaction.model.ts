@@ -7,6 +7,7 @@ import {
   BelongsToSetAssociationMixin,
 } from "sequelize";
 import { sequelize } from "../config/database";
+import Category from "./category.model";
 
 // Atributos da transação
 interface TransactionAttributes {
@@ -49,9 +50,12 @@ class Transaction
   public updatedAt!: Date;
 
   // Métodos de associação
-  public getCategory!: BelongsToGetAssociationMixin<any>;
-  public setCategory!: BelongsToSetAssociationMixin<any, number>;
+  public getCategory!: BelongsToGetAssociationMixin<Category>;
+  public setCategory!: BelongsToSetAssociationMixin<Category, number>;
   public getUser!: BelongsToGetAssociationMixin<any>;
+
+  // Propriedade para categoria relacionada (adicionada para compatibilidade com TypeScript)
+  public category?: Category;
 }
 
 Transaction.init(
