@@ -5,3 +5,4 @@ export * from "./useCategorias";
 export * from "./useOrcamentos";
 export * from "./useRelatorios";
 export * from "./useIaInsights";
+export * from "./useOrcamentosAvancados";
