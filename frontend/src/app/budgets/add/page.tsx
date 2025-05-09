@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useOrcamentos, useCategorias } from "@/hooks";
 import { ROTAS } from "@/constants/rotas";
-import { OrcamentoCriar } from "@/types/orcamento";
+import { OrcamentoCriar, OrcamentoAtualizar } from "@/types/orcamento";
 
 // Components
 import { FormularioOrcamento } from "@/components/organismos/orcamentos/FormularioOrcamento";
@@ -31,9 +31,22 @@ export default function AddBudgetPage() {
     buscarCategorias();
   }, [buscarCategorias]);
 
-  // Handle budget creation
-  const handleCreateBudget = async (dados: OrcamentoCriar) => {
-    const novoOrcamento = await criarOrcamento(dados);
+  // Handle budget creation - now accepts both types
+  const handleCreateBudget = async (
+    dados: OrcamentoCriar | OrcamentoAtualizar
+  ) => {
+    // Since we're in create mode, we can assert that all required fields are present
+    // Convert OrcamentoAtualizar to OrcamentoCriar by providing default values for required fields
+    const dadosCompletos: OrcamentoCriar = {
+      name: dados.name || "",
+      amount: dados.amount || 0,
+      startDate: dados.startDate || "",
+      endDate: dados.endDate || "",
+      recurrence: dados.recurrence,
+      categoryIds: dados.categoryIds || [],
+    };
+
+    const novoOrcamento = await criarOrcamento(dadosCompletos);
 
     if (novoOrcamento) {
       router.push(ROTAS.PRIVATE.ORCAMENTOS.LISTAR);

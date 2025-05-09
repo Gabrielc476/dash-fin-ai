@@ -67,7 +67,7 @@ export default function EditBudgetPage() {
   return (
     <div className="container py-6">
       <FormularioOrcamento
-        orcamento={orcamentoAtual}
+        orcamento={orcamentoAtual || undefined} // Convert null to undefined
         categorias={categorias}
         onSubmit={handleUpdateBudget}
         isLoading={isLoadingOrcamento || isLoadingCategorias}
