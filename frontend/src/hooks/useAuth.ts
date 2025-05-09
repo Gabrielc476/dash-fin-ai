@@ -1,6 +1,7 @@
-// src/hooks/useAuth.ts
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { authApi } from "../api";
 import { User, LoginRequest, RegisterRequest } from "../types/auth";
 import { ROTAS } from "../constants/rotas";
@@ -114,6 +115,8 @@ export function useAuth() {
       isLoading: false,
       error: null,
     });
+
+    // Aqui usamos o router que foi inicializado no contexto do cliente
     router.push(ROTAS.PUBLIC.LOGIN);
   }, [router]);
 
