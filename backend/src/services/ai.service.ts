@@ -22,7 +22,7 @@ class AIService {
   }
 
   /**
-   * Extrai texto da resposta do Claude
+   * Extrai texto da resposta do Claude e limpa formatação Markdown
    */
   private extractTextFromResponse(response: any): string {
     // Verifica se há conteúdo na resposta
@@ -37,6 +37,16 @@ class AIService {
         fullText += block.text;
       }
     }
+
+    // Limpa formatação Markdown para JSON
+    // Remove delimitadores de código Markdown como ```json e ```
+    fullText = fullText.replace(/```json\s*/, "").replace(/```\s*$/, "");
+
+    // Remove outros possíveis delimitadores de código
+    fullText = fullText.replace(/```[a-z]*\s*/g, "").replace(/```/g, "");
+
+    // Remove espaços em branco excessivos no início e fim
+    fullText = fullText.trim();
 
     return fullText;
   }
@@ -147,7 +157,7 @@ class AIService {
         Dados financeiros:
         ${JSON.stringify(financialData, null, 2)}
         
-        Responda apenas em formato JSON com a seguinte estrutura:
+        Responda apenas em formato JSON puro sem qualquer texto adicional, formatação Markdown ou delimitadores de código. Retorne diretamente o array JSON:
         [
           {
             "tipo": "string (padrao_gasto, oportunidade_economia, deteccao_anomalia, recomendacao_orcamento, tendencia)",
@@ -167,7 +177,7 @@ class AIService {
         max_tokens: 2000,
         temperature: 0.2,
         system:
-          "Você é um assistente financeiro especializado. Responda apenas em JSON válido sem comentários adicionais.",
+          "Você é um assistente financeiro especializado. Responda apenas em JSON válido puro, sem formatação Markdown, delimitadores de código ou comentários adicionais.",
         messages: [{ role: "user", content: prompt }],
       });
 
@@ -267,7 +277,7 @@ class AIService {
         2. Se há oportunidades de economia relacionadas a esta categoria
         3. Sugestões relevantes para o planejamento financeiro
         
-        Responda apenas em formato JSON:
+        Responda apenas em formato JSON puro, sem formatação Markdown ou delimitadores de código:
         {
           "titulo": "string",
           "recomendacao": "string",
@@ -282,7 +292,7 @@ class AIService {
         max_tokens: 1000,
         temperature: 0.3,
         system:
-          "Você é um assistente financeiro especializado. Responda apenas em JSON válido.",
+          "Você é um assistente financeiro especializado. Responda apenas em JSON válido puro, sem formatação Markdown, delimitadores de código ou comentários adicionais.",
         messages: [{ role: "user", content: prompt }],
       });
 
@@ -349,7 +359,7 @@ class AIService {
         Analise os padrões de gastos e tendências para prever os valores futuros.
         Considere sazonalidade, tendências de longo prazo e gasto médio.
         
-        Responda apenas em formato JSON com a seguinte estrutura:
+        Responda apenas em formato JSON puro, sem formatação Markdown ou delimitadores de código:
         {
           "previsao": [
             {
@@ -373,7 +383,7 @@ class AIService {
         max_tokens: 2000,
         temperature: 0.3,
         system:
-          "Você é um analista financeiro especializado. Responda apenas em JSON válido sem comentários adicionais.",
+          "Você é um analista financeiro especializado. Responda apenas em JSON válido puro, sem formatação Markdown, delimitadores de código ou comentários adicionais.",
         messages: [{ role: "user", content: prompt }],
       });
 
@@ -411,7 +421,7 @@ class AIService {
         Dados financeiros:
         ${JSON.stringify(financialData, null, 2)}
         
-        Forneça uma avaliação em formato JSON com a seguinte estrutura:
+        Forneça uma avaliação em formato JSON puro, sem formatação Markdown ou delimitadores de código:
         {
           "pontuacao_saude": float (0-10),
           "avaliacoes": [
@@ -434,7 +444,7 @@ class AIService {
         max_tokens: 2500,
         temperature: 0.2,
         system:
-          "Você é um consultor financeiro experiente. Responda apenas em JSON válido sem comentários adicionais.",
+          "Você é um consultor financeiro experiente. Responda apenas em JSON válido puro, sem formatação Markdown, delimitadores de código ou comentários adicionais.",
         messages: [{ role: "user", content: prompt }],
       });
 
