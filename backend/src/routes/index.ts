@@ -6,7 +6,7 @@ import transactionRoutes from "./transactions.routes";
 import categoryRoutes from "./categories.routes";
 import budgetRoutes from "./budgets.routes";
 import reportRoutes from "./reports.routes";
-// import aiInsightRoutes from './ai-insights.routes';
+import aiInsightRoutes from "./ai-insights.routes";
 
 const router = Router();
 
@@ -17,6 +17,6 @@ router.use("/transactions", transactionRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/budgets", budgetRoutes);
 router.use("/reports", reportRoutes);
-// router.use('/ai', aiInsightRoutes);
+router.use("/ai", aiInsightRoutes);
 
 export default router;
