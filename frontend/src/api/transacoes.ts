@@ -1,4 +1,4 @@
-// src/api/transacoes.ts
+// frontend/src/api/transacoes.ts
 import api from "./cliente";
 import { ROTAS } from "../constants/rotas";
 import {
@@ -16,7 +16,7 @@ export const transacoesApi = {
    * @param filtros Filtros para a listagem
    * @returns Lista de transações
    */
-  async listar(filtros: TransacaoFiltros = {}): Promise<Transacao[]> {
+  async listar(filtros: any = {}): Promise<Transacao[]> {
     const { data } = await api.get<Transacao[]>(ROTAS.API.TRANSACOES.BASE, {
       params: filtros,
     });

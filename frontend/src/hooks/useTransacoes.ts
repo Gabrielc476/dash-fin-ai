@@ -1,4 +1,6 @@
-// src/hooks/useTransacoes.ts
+// frontend/src/hooks/useTransacoes.ts
+"use client";
+
 import { useState, useCallback, useEffect } from "react";
 import { transacoesApi } from "../api";
 import {
@@ -32,7 +34,22 @@ export function useTransacoes(filtrosIniciais: TransacaoFiltros = {}) {
       setError(null);
 
       try {
-        const data = await transacoesApi.listar(filtrosBusca);
+        // Converter os filtros para o formato esperado pelo backend
+        const parametros = {
+          skip: filtrosBusca.pular,
+          limit: filtrosBusca.limite,
+          startDate: filtrosBusca.dataInicial,
+          endDate: filtrosBusca.dataFinal,
+        };
+
+        // Remover parâmetros undefined
+        Object.keys(parametros).forEach((key) => {
+          if (parametros[key] === undefined) {
+            delete parametros[key];
+          }
+        });
+
+        const data = await transacoesApi.listar(parametros);
         setTransacoes(data);
       } catch (error: any) {
         setError(error.message || "Erro ao buscar transações");

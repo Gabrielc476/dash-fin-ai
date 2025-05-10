@@ -1,4 +1,4 @@
-// src/types/transacao.ts
+// frontend/src/types/transacao.ts
 
 import { Categoria } from "./categoria";
 
@@ -43,8 +43,8 @@ export interface TransacaoAtualizar {
 export interface TransacaoFiltros {
   pular?: number;
   limite?: number;
-  dataInicial?: string;
-  dataFinal?: string;
+  dataInicial?: string; // Para ser enviado como startDate
+  dataFinal?: string; // Para ser enviado como endDate
 }
 
 export interface ResumoCategoria {
