@@ -1,26 +1,39 @@
-// frontend/src/components/organismos/dashboard/InsightsDashboard/index.tsx
-import { Button } from "@/components/ui/button";
+"use client";
+
+// Component to display insights in the dashboard
+import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InsightCard } from "@/components/organismos/insights/InsightCard";
 import { ROTAS } from "@/constants/rotas";
-import { formatarMoeda } from "@/utils/formatadores";
-import { ArrowRight, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { Insight, TipoInsight } from "@/types";
+import {
+  Brain,
+  Sparkles,
+  ArrowRight,
+  Loader2,
+  PlusCircle,
+  TrendingDown,
+  AlertTriangle,
+  PieChart,
+  TrendingUp,
+  InfoIcon,
+} from "lucide-react";
 
 interface InsightsDashboardProps {
-  insights: any[];
+  insights: Insight[];
   categorias: any[];
   isLoading: boolean;
-  onGerarInsights: () => void;
-  onNavegar: (rota: string) => void;
-  limite?: number;
+  onGerarInsights: () => Promise<any>;
+  onNavegar: (route: string) => void;
 }
 
 export function InsightsDashboard({
@@ -29,124 +42,199 @@ export function InsightsDashboard({
   isLoading,
   onGerarInsights,
   onNavegar,
-  limite = 6,
 }: InsightsDashboardProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Get top 3 insights by relevance score
+  const topInsights = [...insights]
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, 3);
+
+  // Function to handle generating insights
+  const handleGerarInsights = async () => {
+    setIsGenerating(true);
+    try {
+      await onGerarInsights();
+    } catch (error) {
+      console.error("Erro ao gerar insights:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Function to get icon by insight type
+  const getIconByType = (type: TipoInsight) => {
+    switch (type) {
+      case TipoInsight.PADRAO_GASTO:
+        return <PieChart className="w-5 h-5" />;
+      case TipoInsight.OPORTUNIDADE_ECONOMIA:
+        return <TrendingDown className="w-5 h-5 text-green-500" />;
+      case TipoInsight.DETECCAO_ANOMALIA:
+        return <AlertTriangle className="w-5 h-5 text-amber-500" />;
+      case TipoInsight.RECOMENDACAO_ORCAMENTO:
+        return <TrendingUp className="w-5 h-5 text-blue-500" />;
+      case TipoInsight.TENDENCIA:
+        return <TrendingUp className="w-5 h-5 text-purple-500" />;
+      case TipoInsight.INFORMATIVO:
+      default:
+        return <InfoIcon className="w-5 h-5 text-gray-500" />;
+    }
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Sparkles className="w-5 h-5 mr-2" />
-            Insights Financeiros
-          </div>
-          <Button
-            onClick={onGerarInsights}
-            disabled={isLoading}
-            size="sm"
-            variant="outline"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Gerando...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Gerar Novos
-              </>
-            )}
-          </Button>
-        </CardTitle>
-        <CardDescription>
-          Recomendações personalizadas baseadas em seus dados
-        </CardDescription>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center">
+            <Brain className="w-6 h-6 mr-2 text-primary" />
+            Insights de IA
+          </CardTitle>
+          <Badge variant="outline" className="px-3">
+            Powered by Claude 3.7
+          </Badge>
+        </div>
       </CardHeader>
+
       <CardContent>
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array(limite)
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Array(3)
               .fill(0)
               .map((_, i) => (
-                <div key={i} className="space-y-2 p-4 border rounded-lg">
-                  <Skeleton className="h-5 w-3/4" />
+                <div key={i} className="p-4 border rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-5 w-10" />
+                  </div>
+                  <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
-                  <Skeleton className="h-4 w-1/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
                 </div>
               ))}
           </div>
-        ) : insights.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {insights.slice(0, limite).map((insight) => (
+        ) : topInsights.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {topInsights.map((insight) => (
               <div
                 key={insight.id}
-                className="border rounded-lg p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+                className="border rounded-lg p-4 hover:bg-accent/5 cursor-pointer transition-colors"
                 onClick={() =>
                   onNavegar(ROTAS.PRIVATE.INSIGHTS.DETALHE(insight.id))
                 }
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-sm">{insight.title}</h3>
-                  <Badge variant="secondary" className="text-xs">
-                    {insight.relevanceScore}/10
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      {getIconByType(insight.type)}
+                    </div>
+                    <Badge
+                      className={
+                        insight.relevanceScore >= 8
+                          ? "bg-red-100 text-red-800"
+                          : insight.relevanceScore >= 6
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-blue-100 text-blue-800"
+                      }
+                    >
+                      {insight.relevanceScore.toFixed(1)}
+                    </Badge>
+                  </div>
+                  <Badge variant="outline">
+                    {insight.type === TipoInsight.PADRAO_GASTO
+                      ? "Padrão"
+                      : insight.type === TipoInsight.OPORTUNIDADE_ECONOMIA
+                      ? "Economia"
+                      : insight.type === TipoInsight.DETECCAO_ANOMALIA
+                      ? "Anomalia"
+                      : insight.type === TipoInsight.RECOMENDACAO_ORCAMENTO
+                      ? "Orçamento"
+                      : insight.type === TipoInsight.TENDENCIA
+                      ? "Tendência"
+                      : "Info"}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+
+                <h4 className="font-medium mb-2">{insight.title}</h4>
+
+                <p className="text-sm text-muted-foreground line-clamp-3">
                   {insight.description}
                 </p>
+
                 {insight.impactValue && (
-                  <div className="flex justify-between items-center">
-                    <Badge
-                      variant={
-                        insight.impactValue > 0 ? "default" : "destructive"
-                      }
-                      className="text-xs"
-                    >
-                      {insight.impactValue > 0 ? "+" : ""}
-                      {formatarMoeda(Math.abs(insight.impactValue))}
-                    </Badge>
-                    {insight.categories && insight.categories.length > 0 && (
-                      <div className="flex -space-x-1">
-                        {insight.categories.slice(0, 3).map((cat) => (
-                          <div
-                            key={cat.id}
-                            className="w-4 h-4 rounded-full border-2 border-background"
-                            style={{
-                              backgroundColor:
-                                categorias.find((c) => c.id === cat.id)
-                                  ?.color || "#666",
-                            }}
-                            title={cat.name}
-                          />
-                        ))}
-                      </div>
-                    )}
+                  <div className="mt-2 text-sm">
+                    <span className="font-medium">Impacto potencial:</span>{" "}
+                    <span className="text-green-600 font-medium">
+                      {new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(insight.impactValue)}
+                    </span>
                   </div>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center text-muted-foreground py-12">
-            <Sparkles className="w-10 h-10 mx-auto mb-3 opacity-50" />
-            <p className="text-lg font-medium">Nenhum insight disponível</p>
-            <p className="text-sm mt-1">
-              Clique em "Gerar Novos" para receber recomendações personalizadas
+          <div className="text-center py-6">
+            <div className="bg-primary/5 p-4 rounded-full inline-flex mb-3">
+              <Brain className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-medium text-lg mb-2">
+              Sem insights disponíveis
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Gere novos insights para receber recomendações personalizadas com
+              base nos seus dados financeiros.
             </p>
+            <Button onClick={handleGerarInsights} disabled={isGenerating}>
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Gerando insights...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Gerar Insights
+                </>
+              )}
+            </Button>
           </div>
         )}
       </CardContent>
-      <CardFooter>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => onNavegar(ROTAS.PRIVATE.INSIGHTS.LISTAR)}
-        >
-          Ver todos os insights
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Button>
-      </CardFooter>
+
+      {topInsights.length > 0 && (
+        <CardFooter className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handleGerarInsights}
+            disabled={isGenerating}
+            size="sm"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Gerando...
+              </>
+            ) : (
+              <>
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Gerar Novos Insights
+              </>
+            )}
+          </Button>
+
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => onNavegar(ROTAS.PRIVATE.INSIGHTS.LISTAR)}
+          >
+            Ver Todos os Insights
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

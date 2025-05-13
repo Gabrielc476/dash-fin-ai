@@ -1,7 +1,7 @@
 // frontend/src/app/(private)/reports/category/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -115,11 +115,27 @@ export default function RelatorioCategoriasPage() {
     }
   }, [filtros.periodo]);
 
-  // Carregar dados quando componente monta
+  // Memoize a função carregarDados com useCallback
+  const carregarDadosCallback = useCallback(() => {
+    const categoriaIds =
+      filtros.categoriasIds.length > 0 ? filtros.categoriasIds : undefined;
+    obterRelatorioCategoria(
+      filtros.dataInicial,
+      filtros.dataFinal,
+      categoriaIds
+    );
+  }, [
+    filtros.dataInicial,
+    filtros.dataFinal,
+    filtros.categoriasIds,
+    obterRelatorioCategoria,
+  ]);
+
+  // Carregar categorias e dados quando componente monta
   useEffect(() => {
     buscarCategorias();
-    carregarDados();
-  }, []);
+    carregarDadosCallback();
+  }, [buscarCategorias, carregarDadosCallback]);
 
   const carregarDados = () => {
     const categoriaIds =

@@ -1,7 +1,7 @@
 // frontend/src/app/(private)/reports/income-expense/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -113,10 +113,24 @@ export default function ReceitaDespesaPage() {
     }
   }, [filtros.periodo]);
 
-  // Carregar dados quando componente monta ou filtros mudam
+  // Memoize a função carregarDados com useCallback
+  const carregarDadosCallback = useCallback(() => {
+    obterRelatorioReceitaDespesa(
+      filtros.dataInicial,
+      filtros.dataFinal,
+      filtros.agrupamento
+    );
+  }, [
+    filtros.dataInicial,
+    filtros.dataFinal,
+    filtros.agrupamento,
+    obterRelatorioReceitaDespesa,
+  ]);
+
+  // Use o callback no useEffect
   useEffect(() => {
-    carregarDados();
-  }, []);
+    carregarDadosCallback();
+  }, [carregarDadosCallback]);
 
   const carregarDados = () => {
     obterRelatorioReceitaDespesa(
